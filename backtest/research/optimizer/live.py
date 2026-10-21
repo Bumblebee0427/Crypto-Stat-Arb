@@ -10,7 +10,7 @@ from datetime import timedelta
 import numpy as np
 import pandas as pd
 
-from .alpha import fit_alpha, predict_alpha
+from .alpha import fit_alpha, predict_alpha, alpha_fingerprint
 from .contracts import ResearchConfig
 from .factor_risk_tuning import RiskSpec, estimate_grid
 from .funding import forecast_funding
@@ -76,7 +76,11 @@ def allocation(snapshot, history, factors, settlements, positions, marks, budget
         alpha, supported = predict_alpha(rows, model)
         alpha_info = {'status': 'v3_trained' if supported.any() else 'v3_training_warmup_zero_alpha',
                       'training_days': model.training_days, 'fitted_at': str(model.fitted_at),
-                      'label_cutoff': None if pd.isna(model.label_cutoff) else str(model.label_cutoff)}
+                      'label_cutoff': None if pd.isna(model.label_cutoff) else str(model.label_cutoff),
+                      'supported_sides': sorted(model.models), 'model_fingerprint':alpha_fingerprint(model)}
+        if set(model.models) != {-1, 1}:
+            alpha[:] = 0.; supported[:] = False
+            alpha_info['status'] = 'v3_training_warmup_zero_alpha'
     events = settlements.copy()
     events['time'] = pd.to_datetime(events.time, utc=True).dt.tz_localize(None)
     events['event_hour'] = events.time.dt.floor('h')

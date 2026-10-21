@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from core.model.ridge_regression import fit_ridge_regression
+from .contracts import digest
 
 FEATURES = ['main_rank', 'small_rank']
 
@@ -21,9 +22,15 @@ class AlphaModel:
     shrink: float
 
 
+def alpha_fingerprint(model):
+    return digest({'models':{str(k):v.to_dict() for k,v in model.models.items()},
+                   'clips':model.clips, 'shrink':model.shrink})
+
+
 def fit_alpha(panel, cutoff, config):
     cutoff = pd.Timestamp(cutoff)
-    train = panel.loc[(panel['asof'] >= cutoff-pd.Timedelta(days=config.train_days)) &
+    train = panel.loc[(panel['asof'] < cutoff) &
+                      (panel['asof'] >= cutoff-pd.Timedelta(days=config.train_days)) &
                       (panel.label_available_at <= cutoff)].copy()
     train = train.dropna(subset=FEATURES+['future_return'])
     models, clips, bins = {}, {}, {}

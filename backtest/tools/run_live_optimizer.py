@@ -23,6 +23,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from research.optimizer.contracts import write_json
+from research.optimizer.alpha_bootstrap import validated_history
 
 
 def remote(config, host, program, *, sudo=False):
@@ -105,6 +106,7 @@ def archive_v3_alpha(root, source, boundary):
         side = 1 if weight > 0 else -1; factors = source['factors'][symbol]
         rows.append({'asof':date, 'symbol':symbol, 'side':side,
             'entry_at':pd.Timestamp(source['generated_at']).tz_convert('UTC').tz_localize(None).ceil('min'),
+            'feature_available_at':pd.Timestamp(source['generated_at']).tz_convert('UTC').tz_localize(None),
             'main':factors['main'], 'small':factors['small_long' if side > 0 else 'small_short'],
             'formula_version':source['formula_version']})
     current = pd.DataFrame(rows)
@@ -148,7 +150,14 @@ def archive_v3_alpha(root, source, boundary):
     panel = panel.merge(exits,on=['asof','symbol'],how='left')
     panel['future_return'] = panel.exit_price/panel.entry_price-1
     panel['label_available_at'] = panel['asof']+pd.Timedelta(days=1,hours=1)
+    try:
+        historical, release = validated_history(root, boundary)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        historical, release = None, {'status':'history_release_rejected', 'reason':str(exc)}
+    if historical is not None:
+        panel = pd.concat([historical, panel], ignore_index=True).drop_duplicates(['asof','symbol'], keep='last')
     panel.to_parquet(root/'alpha_panel.parquet',index=False)
+    write_json(root/'alpha_bootstrap_status.json', release or {'status':'no_validated_history_release'})
 
 
 def main():
