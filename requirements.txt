@@ -1,0 +1,3 @@
+# Tested with Python 3.12; shared development environment for both packages.
+-r backtest/requirements-factor-risk.txt
+seaborn==0.13.2

@@ -1,0 +1,152 @@
+[
+  {
+    "strategy": "Strategy_低价币多空策略",
+    "offset_list": [
+      0
+    ],
+    "hold_period": "24H",
+    "market": "swap_swap",
+    "is_use_spot": false,
+    "cap_weight": 1.0,
+    "long_cap_weight": 1.0,
+    "short_cap_weight": 0.0,
+    "long_select_coin_num": 0.2,
+    "short_select_coin_num": 0,
+    "factor_weight_method": "equal",
+    "fama_macbeth_window_days": 60,
+    "fama_macbeth_window": 168,
+    "fama_macbeth_config": null,
+    "factor_list": [],
+    "long_factor_list": [
+      [
+        "big_ultra_harmonic_rm240_mean_1d_lindecay",
+        false,
+        12,
+        1
+      ]
+    ],
+    "short_factor_list": [],
+    "long_filter_list": [
+      [
+        "small_qty_misalignment_rankcorr_lag5_1d",
+        8,
+        "pct:>=0.4",
+        true
+      ],
+      [
+        "QuoteVolumeMean",
+        600,
+        "pct:<=0.5",
+        false
+      ]
+    ],
+    "short_filter_list": [],
+    "long_filter_list_post": [],
+    "short_filter_list_post": [],
+    "filter_list": [],
+    "filter_list_post": [],
+    "use_custom_func": false
+  },
+  {
+    "strategy": "Strategy_低价币多空策略",
+    "offset_list": [
+      0
+    ],
+    "hold_period": "24H",
+    "market": "swap_swap",
+    "is_use_spot": false,
+    "cap_weight": 0.45,
+    "long_cap_weight": 0.0,
+    "short_cap_weight": 1.0,
+    "long_select_coin_num": 0,
+    "short_select_coin_num": 0.15,
+    "factor_weight_method": "equal",
+    "fama_macbeth_window_days": 60,
+    "fama_macbeth_window": 168,
+    "fama_macbeth_config": null,
+    "factor_list": [],
+    "long_factor_list": [],
+    "short_factor_list": [
+      [
+        "big_ultra_harmonic_rm240_mean_1d_lindecay",
+        false,
+        12,
+        1
+      ]
+    ],
+    "long_filter_list": [],
+    "short_filter_list": [
+      [
+        "small_qty_misalignment_rankcorr_lag5_1d",
+        4,
+        "pct:<=0.35",
+        true
+      ],
+      [
+        "QuoteVolumeMean",
+        600,
+        "pct:<=0.5",
+        false
+      ]
+    ],
+    "long_filter_list_post": [],
+    "short_filter_list_post": [],
+    "filter_list": [],
+    "filter_list_post": [],
+    "use_custom_func": false
+  },
+  {
+    "strategy": "Strategy_低价币多空策略",
+    "offset_list": [
+      0
+    ],
+    "hold_period": "24H",
+    "market": "swap_swap",
+    "is_use_spot": false,
+    "cap_weight": 0.55,
+    "long_cap_weight": 0.0,
+    "short_cap_weight": 1.0,
+    "long_select_coin_num": 0,
+    "short_select_coin_num": 0.15,
+    "factor_weight_method": "equal",
+    "fama_macbeth_window_days": 60,
+    "fama_macbeth_window": 168,
+    "fama_macbeth_config": null,
+    "factor_list": [],
+    "long_factor_list": [],
+    "short_factor_list": [
+      [
+        "big_ultra_harmonic_rm240_mean_1d_lindecay",
+        false,
+        12,
+        1
+      ]
+    ],
+    "long_filter_list": [],
+    "short_filter_list": [
+      [
+        "small_qty_misalignment_rankcorr_lag5_1d",
+        4,
+        "pct:<=0.35",
+        true
+      ],
+      [
+        "btc_market_trend_shift1_1d",
+        30,
+        "val:<=0.2",
+        true
+      ],
+      [
+        "QuoteVolumeMean",
+        600,
+        "pct:<=0.5",
+        false
+      ]
+    ],
+    "long_filter_list_post": [],
+    "short_filter_list_post": [],
+    "filter_list": [],
+    "filter_list_post": [],
+    "use_custom_func": false
+  }
+]

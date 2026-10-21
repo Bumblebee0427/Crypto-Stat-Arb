@@ -1,0 +1,37 @@
+{
+  "strategy": "historical_top50_v2_qv600_equal_weight_baseline",
+  "formula": "original same-hour quantiles v2; distinct from live previous-hour v3",
+  "volume_filter_hours": 600,
+  "leverage": 2,
+  "oneway_fee_rate": 0.0008,
+  "funding_included": true,
+  "optimizer_enabled": false,
+  "metric_definitions": {
+    "frequency": "complete UTC calendar days; net of all fees and funding",
+    "annualization_days": 365,
+    "minimum_acceptable_daily_return": 0.0,
+    "sortino": "sqrt(365) * mean(r) / sqrt(mean(min(r, 0)^2)); denominator includes ALL days",
+    "sharpe": "sqrt(365) * mean(r) / sample_std(r, ddof=1); risk-free return assumed zero",
+    "undefined_ratio": "null when the denominator is zero"
+  },
+  "metrics": {
+    "days": 2105,
+    "start": "2021-01-02",
+    "end": "2026-10-07",
+    "cumulative_return": 2453.3000445124258,
+    "annual_return": 2.8708129247633907,
+    "annual_volatility": 0.7912863773818147,
+    "sharpe": 2.047380672243618,
+    "sortino": 4.316229759474495,
+    "max_drawdown": -0.3415524481271899,
+    "worst_day": -0.1782541125931829,
+    "cvar_95": -0.0641015844705376,
+    "mean_daily_fee_bps": 12.77086394677694,
+    "mean_daily_funding_bps": -1.9844021454621001,
+    "mean_daily_turnover": 1.596357993347117,
+    "mean_daily_resize_fee_bps": 3.918652615726422
+  },
+  "source_sha256": "026e60a84aed1df96d02fa8a84b68e8933bfe2947fa65cb2af057f26c35f98f1",
+  "provenance": "Original baseline replay; baseline hourly accounting parity verified locally.",
+  "scope": "Historical simulation using revised data, not live account returns."
+}
