@@ -18,6 +18,12 @@
     "portable_adapter": false
   },
   {
+    "path": "live/data_center/consumer.py",
+    "source_sha256": "190222d0bd7d934447bd7127269373fcdf9a555b0a884b2902285134d3e89128",
+    "export_sha256": "190222d0bd7d934447bd7127269373fcdf9a555b0a884b2902285134d3e89128",
+    "portable_adapter": false
+  },
+  {
     "path": "live/data_center/contract.py",
     "source_sha256": "1ebaf5580d7ab057e5a165e60ad5b14f6c0461daa447917839946b84399ecaff",
     "export_sha256": "1ebaf5580d7ab057e5a165e60ad5b14f6c0461daa447917839946b84399ecaff",
@@ -75,6 +81,12 @@
     "path": "live/data_center/minute_parity.py",
     "source_sha256": "ed2dfe302fc021a6b89fc3dcf19f44789b658e28c2a951e7f97ea0577a207691",
     "export_sha256": "ed2dfe302fc021a6b89fc3dcf19f44789b658e28c2a951e7f97ea0577a207691",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/data_center/optimizer_overlay.py",
+    "source_sha256": "483ec5109280b68344851bd01a5f45bbb10241bb702861a89f36cf8bcc8b5811",
+    "export_sha256": "483ec5109280b68344851bd01a5f45bbb10241bb702861a89f36cf8bcc8b5811",
     "portable_adapter": false
   },
   {
@@ -154,6 +166,12 @@
     "source_sha256": "c7860748ca88d738819d0217c8b0c4b070177d7a3ace7b0638bb90a1649e7d89",
     "export_sha256": "28e42dce8f324223436a26343f2aa7b5e48161f0803da1cc930a0e0361572a56",
     "portable_adapter": true
+  },
+  {
+    "path": "live/tests/test_optimizer_overlay.py",
+    "source_sha256": "7f38b8ab90ad182d34ec752b54a8acb18c5429419234200b284b4b045824276a",
+    "export_sha256": "7f38b8ab90ad182d34ec752b54a8acb18c5429419234200b284b4b045824276a",
+    "portable_adapter": false
   },
   {
     "path": "live/tests/test_qualified_pool.py",
@@ -450,6 +468,12 @@
     "portable_adapter": true
   },
   {
+    "path": "backtest/research/optimizer/live.py",
+    "source_sha256": "298fa1d53afb25bca81c020c02292c952a9560e95a433b3f9ef5f812a5c1a6ff",
+    "export_sha256": "298fa1d53afb25bca81c020c02292c952a9560e95a433b3f9ef5f812a5c1a6ff",
+    "portable_adapter": false
+  },
+  {
     "path": "backtest/research/optimizer/paper_factors.py",
     "source_sha256": "03c8b566cbfcaf28093120662f680158515a36061171ff007b3f14fe5d7f2f38",
     "export_sha256": "03c8b566cbfcaf28093120662f680158515a36061171ff007b3f14fe5d7f2f38",
@@ -522,9 +546,27 @@
     "portable_adapter": false
   },
   {
+    "path": "backtest/tests/test_optimizer_live.py",
+    "source_sha256": "4c924de06f213cd5b5e041f83e98a78f2eebe1b41036da87ec0256e10d32dfb5",
+    "export_sha256": "4c924de06f213cd5b5e041f83e98a78f2eebe1b41036da87ec0256e10d32dfb5",
+    "portable_adapter": false
+  },
+  {
     "path": "backtest/tests/test_optimizer_refinements.py",
     "source_sha256": "db2e1a8349bcbf60533be3a0fb98271f3937193d9f8fddc8311da067547987fa",
     "export_sha256": "db2e1a8349bcbf60533be3a0fb98271f3937193d9f8fddc8311da067547987fa",
+    "portable_adapter": false
+  },
+  {
+    "path": "backtest/tools/build_live_optimizer_artifact.py",
+    "source_sha256": "518c81c3006c7499f96a5fa86333290f471d396d0ec1278d8521d2fd1d3110b2",
+    "export_sha256": "518c81c3006c7499f96a5fa86333290f471d396d0ec1278d8521d2fd1d3110b2",
+    "portable_adapter": false
+  },
+  {
+    "path": "backtest/tools/run_live_optimizer.py",
+    "source_sha256": "b73b36fd7bbfa7bc058fe94da96a526d0543c1288dc4950ca6c3c71f64a72799",
+    "export_sha256": "b73b36fd7bbfa7bc058fe94da96a526d0543c1288dc4950ca6c3c71f64a72799",
     "portable_adapter": false
   },
   {
@@ -532,6 +574,12 @@
     "source_sha256": "3a4e349507ef41f18c0287b96e36b876d9138a01023563841f7b9868d430e164",
     "export_sha256": "1b05b64ab83e957b9b6723c33abeff9981f1a245edaff727836224942558ccaa",
     "portable_adapter": true
+  },
+  {
+    "path": "backtest/tools/update_live_optimizer_data.py",
+    "source_sha256": "c5f9b34d6a4cab005c966c65f06c6e472151eb7cc9849814ea0b40a4a131174b",
+    "export_sha256": "c5f9b34d6a4cab005c966c65f06c6e472151eb7cc9849814ea0b40a4a131174b",
+    "portable_adapter": false
   },
   {
     "path": "backtest/update_min_qty.py",
