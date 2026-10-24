@@ -10,35 +10,57 @@ import math
 from pathlib import Path
 
 from data_center.contract import digest, seal, timestamp
+from data_center.live_schedule import LIVE_WINDOW_MINUTES, OPTIMIZER_WAIT_SECONDS
 
 SCHEMA = 'select_coin.optimizer.v1'
 MODEL = 'core_w90_f14_r14_cv_diagonal'
 BLEND = 0.25
 
 
-def should_wait(info, root, now):
-    """Give the producer until 08:08 CST, leaving two minutes for execution."""
-    if info.get('status') == 'applied':
+def wait_deadline(snapshot):
+    # Three five-second polling ticks before the last decision. A failed
+    # optimizer must still leave an opportunity to execute the baseline.
+    return min(timestamp(snapshot['generated_at'])+timedelta(seconds=OPTIMIZER_WAIT_SECONDS),
+               timestamp(snapshot['window_end'])+timedelta(minutes=LIVE_WINDOW_MINUTES,seconds=-15))
+
+
+def should_wait(info, root, now, snapshot=None):
+    """Only a missing computation gets a bounded grace period; failures fall back."""
+    if info.get('status') in ('applied', 'baseline_fallback') or snapshot is None:
         return False
     try:
         config = json.loads((Path(root)/'optimizer/enabled.json').read_text())
-    except (OSError, ValueError):
+        generated = timestamp(snapshot['generated_at'])
+        boundary = timestamp(snapshot['window_end'])
+    except (OSError, ValueError, KeyError, TypeError):
         return False
-    boundary = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    if not isinstance(config, dict):
+        return False
+    deadline = wait_deadline(snapshot)
     return (config.get('enabled') is True and config.get('model') == MODEL
-            and boundary <= now < boundary+timedelta(minutes=8))
+            and boundary <= generated <= now < deadline)
 
 
 def awaiting_artifact(snapshot, root, now):
-    """Poll a local file before spending signed-API calls on an account audit."""
-    if not should_wait({},root,now): return False
+    """Wait for missing/previous-signal artifacts; a failed current artifact is final."""
+    if not should_wait({}, root, now, snapshot):
+        return False
     try:
-        path=Path(root)/'optimizer'/('target_'+snapshot['window_end'][:10]+'.json')
-        if path.stat().st_size > 1_000_000: return True
-        a=json.loads(path.read_text())
-        return (seal(a)!=a or a.get('status')!='ready' or a.get('diagnostic_only') is not False
-                or a.get('base_snapshot_id')!=snapshot['snapshot_id'])
-    except (OSError,ValueError,TypeError): return True
+        path = Path(root)/'optimizer'/('target_'+snapshot['window_end'][:10]+'.json')
+        if path.stat().st_size > 1_000_000:
+            return False
+        a = json.loads(path.read_text())
+        if not isinstance(a, dict):
+            return False
+        # Files are atomically replaced. A malformed current file is a producer
+        # failure, not a reason to postpone a valid original strategy signal.
+        if seal(a) != a:
+            return False
+        return a.get('base_snapshot_id') != snapshot['snapshot_id']
+    except FileNotFoundError:
+        return True
+    except (OSError, ValueError, TypeError):
+        return False
 
 
 def positions_digest(positions):
@@ -46,7 +68,7 @@ def positions_digest(positions):
 
 
 def apply(snapshot, artifact, positions, budget, now):
-    if seal(artifact) != artifact or artifact.get('schema_version') != SCHEMA:
+    if not isinstance(artifact, dict) or seal(artifact) != artifact or artifact.get('schema_version') != SCHEMA:
         raise ValueError('optimizer artifact integrity/version mismatch')
     if artifact.get('model') != MODEL or artifact.get('blend') != BLEND:
         raise ValueError('optimizer model differs from authorized configuration')
@@ -60,7 +82,7 @@ def apply(snapshot, artifact, positions, budget, now):
     generated = timestamp(artifact['generated_at'])
     if not boundary <= generated <= now or now-generated > timedelta(minutes=10):
         raise ValueError('optimizer artifact future/stale')
-    if timestamp(artifact['valid_until']) != boundary+timedelta(minutes=10) or now >= timestamp(artifact['valid_until']):
+    if timestamp(artifact['valid_until']) != boundary+timedelta(minutes=LIVE_WINDOW_MINUTES) or now >= timestamp(artifact['valid_until']):
         raise ValueError('optimizer opening window expired')
     if timestamp(artifact['max_observation_at']) > boundary:
         raise ValueError('optimizer contains future observations')

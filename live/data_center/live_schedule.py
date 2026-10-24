@@ -1,7 +1,9 @@
-"""One UTC deadline shared by signal publication, decision and opening."""
-from datetime import datetime, timedelta, timezone
+"""UTC boundary policy shared by publisher, optimizer and executor."""
+from datetime import timedelta, timezone
 
-LIVE_WINDOW_MINUTES = 10
+LIVE_WINDOW_MINUTES = 25  # Last publication/decision; leave five minutes to submit.
+OPENING_WINDOW_MINUTES = 30
+OPTIMIZER_WAIT_SECONDS = 120
 
 
 def boundary_deadline(now):

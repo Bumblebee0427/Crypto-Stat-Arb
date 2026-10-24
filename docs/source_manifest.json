@@ -73,8 +73,8 @@
   },
   {
     "path": "live/data_center/live_schedule.py",
-    "source_sha256": "086f8666b8a77a9d0bf861d48a7022853ed1e38cfe94569e6944192a497cd0ed",
-    "export_sha256": "086f8666b8a77a9d0bf861d48a7022853ed1e38cfe94569e6944192a497cd0ed",
+    "source_sha256": "53ac0ebc1e762e66c5b3be9ca78a1e904bc3bd11e849a03beb92bc8460c6ab13",
+    "export_sha256": "53ac0ebc1e762e66c5b3be9ca78a1e904bc3bd11e849a03beb92bc8460c6ab13",
     "portable_adapter": false
   },
   {
@@ -85,8 +85,8 @@
   },
   {
     "path": "live/data_center/optimizer_overlay.py",
-    "source_sha256": "483ec5109280b68344851bd01a5f45bbb10241bb702861a89f36cf8bcc8b5811",
-    "export_sha256": "483ec5109280b68344851bd01a5f45bbb10241bb702861a89f36cf8bcc8b5811",
+    "source_sha256": "38649ce4b63d2f6d3d036dbaa2a0deccc6e638fea45a97751d0e4e88b0cb388c",
+    "export_sha256": "38649ce4b63d2f6d3d036dbaa2a0deccc6e638fea45a97751d0e4e88b0cb388c",
     "portable_adapter": false
   },
   {
@@ -175,8 +175,8 @@
   },
   {
     "path": "live/tests/test_optimizer_overlay.py",
-    "source_sha256": "7f38b8ab90ad182d34ec752b54a8acb18c5429419234200b284b4b045824276a",
-    "export_sha256": "7f38b8ab90ad182d34ec752b54a8acb18c5429419234200b284b4b045824276a",
+    "source_sha256": "77b41c27af6547fc140a73c76947c4617fd233af0ed466720d4c0b28e0565b72",
+    "export_sha256": "77b41c27af6547fc140a73c76947c4617fd233af0ed466720d4c0b28e0565b72",
     "portable_adapter": false
   },
   {
@@ -619,8 +619,8 @@
   },
   {
     "path": "backtest/tools/build_live_optimizer_artifact.py",
-    "source_sha256": "518c81c3006c7499f96a5fa86333290f471d396d0ec1278d8521d2fd1d3110b2",
-    "export_sha256": "518c81c3006c7499f96a5fa86333290f471d396d0ec1278d8521d2fd1d3110b2",
+    "source_sha256": "3931ec9e4026efc8523d9a83b242a3b48188255e273f28426f8632985afe7e9a",
+    "export_sha256": "3931ec9e4026efc8523d9a83b242a3b48188255e273f28426f8632985afe7e9a",
     "portable_adapter": false
   },
   {
@@ -667,8 +667,8 @@
   },
   {
     "path": "backtest/tools/run_live_optimizer.py",
-    "source_sha256": "c6d8b1e763389f994d77208d33beef1a5543ac05b753f7941866a6415175163e",
-    "export_sha256": "c6d8b1e763389f994d77208d33beef1a5543ac05b753f7941866a6415175163e",
+    "source_sha256": "9e610a56e0d480d354454d5fee4cc70dd15bed54d54aa2667f5d5d4978fe2fce",
+    "export_sha256": "9e610a56e0d480d354454d5fee4cc70dd15bed54d54aa2667f5d5d4978fe2fce",
     "portable_adapter": false
   },
   {
@@ -693,6 +693,12 @@
     "path": "backtest/update_min_qty.py",
     "source_sha256": "95bf4d176d8e54da037747a31549fe7ff15680325d2e0a0d90cb19dccb9b072e",
     "export_sha256": "95bf4d176d8e54da037747a31549fe7ff15680325d2e0a0d90cb19dccb9b072e",
+    "portable_adapter": false
+  },
+  {
+    "path": "backtest/tests/test_live_optimizer_schedule.py",
+    "source_sha256": "da13d49470edb490a886c768f350155f7b16a1fe89beb13f60dfb92e0aa61f4e",
+    "export_sha256": "da13d49470edb490a886c768f350155f7b16a1fe89beb13f60dfb92e0aa61f4e",
     "portable_adapter": false
   }
 ]

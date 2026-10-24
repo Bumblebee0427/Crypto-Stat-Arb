@@ -18,6 +18,12 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from research.optimizer.live import allocation, MODEL
+# Support both the private source layout and the public export (live/ + backtest/).
+for live_root in (ROOT.parent/'select-coin-hft-pro', ROOT.parent/'live'):
+    if (live_root/'data_center/live_schedule.py').is_file():
+        sys.path.insert(0, str(live_root))
+        break
+from data_center.live_schedule import LIVE_WINDOW_MINUTES
 
 
 def digest(value):
@@ -53,7 +59,7 @@ def main():
         if seal(signal) != signal or signal.get('status') != 'complete' or signal.get('blockers'):
             raise ValueError('base signal is incomplete or has an invalid checksum')
         boundary = datetime.fromisoformat(signal['window_end'])
-        deadline = boundary+timedelta(minutes=10)
+        deadline = boundary+timedelta(minutes=LIVE_WINDOW_MINUTES)
         if not args.preview and not boundary <= now < deadline:
             raise ValueError('outside the daily opening window')
         observed = datetime.fromisoformat(obs['checked_at'])

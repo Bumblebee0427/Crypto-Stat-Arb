@@ -117,6 +117,7 @@
     "tools/run_optimizer_research.py",
     "tools/update_live_optimizer_data.py",
     "tools/validate_live_alpha_history.py",
-    "update_min_qty.py"
+    "update_min_qty.py",
+    "tests/test_live_optimizer_schedule.py"
   ]
 }

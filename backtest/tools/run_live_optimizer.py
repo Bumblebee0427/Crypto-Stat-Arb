@@ -24,6 +24,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from research.optimizer.contracts import write_json
 from research.optimizer.alpha_bootstrap import validated_history
+# Support both the private source layout and the public export (live/ + backtest/).
+for live_root in (ROOT.parent/'select-coin-hft-pro', ROOT.parent/'live'):
+    if (live_root/'data_center/live_schedule.py').is_file():
+        sys.path.insert(0, str(live_root))
+        break
+from data_center.live_schedule import LIVE_WINDOW_MINUTES
 
 
 def remote(config, host, program, *, sudo=False):
@@ -170,7 +176,7 @@ def main():
     lock = (root/'pipeline.lock').open('a')
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     now = datetime.now(timezone.utc); boundary = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    deadline = boundary+timedelta(minutes=8)
+    deadline = boundary+timedelta(minutes=LIVE_WINDOW_MINUTES)
     if not args.preview and now >= deadline:
         raise ValueError('daily producer started outside the bounded opening window')
     if not args.skip_refresh:
@@ -187,7 +193,13 @@ def main():
     inputs = json.loads((root/'inputs.json').read_text()); inputs['returns'] = 'returns_live.parquet'
     write_json(root/'inputs_live.json', inputs)
     while True:
-        source = signal(config)
+        try:
+            source = signal(config)
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
+            if args.preview or datetime.now(timezone.utc) >= deadline:
+                raise
+            time.sleep(3)
+            continue
         fresh = source.get('window_end') == boundary.isoformat() and source.get('status') == 'complete'
         if fresh: break
         if args.preview or datetime.now(timezone.utc) >= deadline: raise ValueError('fresh complete base signal unavailable')
@@ -205,7 +217,9 @@ def main():
         '--inputs', str(root/'inputs_live.json'), '--signal', str(root/'signal.json'),
         '--observation', str(root/'observation.json'), '--out', str(target)]
     if args.preview: command += ['--preview']
-    subprocess.run(command, check=True, timeout=45)
+    built = subprocess.run(command, check=False, timeout=45)
+    if built.returncode not in (0, 2):
+        raise RuntimeError('optimizer artifact process failed')
     artifact = json.loads(target.read_text())
     if not args.preview:
         destination = config['trade_root']+'/data/top50_daily/optimizer/'+target.name
@@ -223,7 +237,7 @@ print(json.dumps({'status':'delivered','artifact_id':payload['snapshot_id']}))
         remote(config, config['trade_host'], program, sudo=True)
     summary = {'status': 'preview_ready' if args.preview else 'delivered',
         'model': artifact['model'], 'asof': source['window_end'], 'artifact_id': artifact['snapshot_id'],
-        'allocations': len(artifact['allocations']), 'alpha_status': artifact['alpha_status'],
+        'allocations': len(artifact['allocations']), 'alpha_status': artifact.get('alpha_status'), 'artifact_status': artifact['status'],
         'funding_missing_symbols': missing, 'checked_at': datetime.now(timezone.utc).isoformat(),
         'orders_submitted': False}
     write_json(root/'last_run.json', summary); print(json.dumps(summary))
