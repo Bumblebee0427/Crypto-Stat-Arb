@@ -12,8 +12,8 @@ import pandas as pd
 
 from data_center.contract import atomic_json, digest
 from data_center.lagged_quantile_v3 import (
-    FORMULA_CODE_SHA256, FORMULA_VERSION, daily_from_events,
-    events_from_trades, minute_frame, quantiles,
+    FORMULA_CODE_SHA256, FORMULA_VERSION, add_components,
+    events_from_trades, minute_components, minute_frame, quantiles,
 )
 from data_center.reference_formula_v2 import daily_factors
 from deploy.seoul_lagged_minute_shadow import CODE_SHA256 as MINUTE_CODE_SHA256
@@ -30,38 +30,87 @@ STAGED = BASE / 'data/captured_daily_stream_v1/work'
 MAIN = 'big_ultra_harmonic_rm240_mean_1d'
 SMALL = 'small_qty_misalignment_rankcorr_lag5_1d'
 COLS = ('id', 'timestamp_ms', 'price', 'qty', 'maker')
+# Bound the largest pandas allocation before parsing. A symbol exceeding the
+# replay budget is excluded through the existing qualified-pool policy.
+MAX_REPLAY_HOUR_BYTES = 64 * 1024 * 1024
 
 
 def read_hour(path: Path) -> pd.DataFrame:
-    return pd.read_csv(path, header=None, names=COLS,
+    before = path.stat()
+    if before.st_size > MAX_REPLAY_HOUR_BYTES:
+        raise ValueError('hourly replay exceeds memory budget: '+str(path))
+    result = pd.read_csv(path, header=None, names=COLS,
                        dtype={'id': 'int64', 'timestamp_ms': 'int64',
                               'price': 'float64', 'qty': 'float64', 'maker': 'bool'})
+    after = path.stat()
+    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+        raise ValueError('hourly source changed during replay: '+str(path))
+    return result
+
+
+def replay_hour(path: Path, start: pd.Timestamp):
+    before = path.stat()
+    if before.st_size > MAX_REPLAY_HOUR_BYTES:
+        raise ValueError('hourly replay exceeds memory budget: '+str(path))
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    raw = read_hour(path)
+    lo = start.value // 1_000_000
+    hi = (start+pd.Timedelta(hours=1)).value // 1_000_000
+    if raw.empty or not raw.timestamp_ms.between(lo, hi-1).all():
+        raise ValueError('trade outside replay UTC hour: '+str(path))
+    events = events_from_trades(raw)
+    unique = raw.drop_duplicates('id')
+    economic_count = int((~(unique.price.eq(0) & unique.qty.eq(0))).sum())
+    after = path.stat()
+    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+        raise ValueError('hourly source changed during replay: '+str(path))
+    return events, economic_count, int(unique.id.min()), int(unique.id.max()), sha
 
 
 def replay_symbol(day: str, symbol: str, trade_rows: int) -> tuple[dict, dict]:
     """Rebuild only a revised symbol from the captured complete UTC day."""
     prior = (datetime.fromisoformat(day).date() - timedelta(days=1)).isoformat()
     previous_source = STAGED / prior / 'hours' / '23' / f'{symbol}.csv'
-    seed = quantiles(events_from_trades(read_hour(previous_source)))
+    start = pd.Timestamp(day, tz='UTC')
+    seed_events, _, _, _, seed_sha = replay_hour(previous_source, start-pd.Timedelta(hours=1))
+    seed = quantiles(seed_events)
+    del seed_events
+    current = seed
     sources = {}
-    frames = []
+    parts = {}
+    economic_count = 0
+    previous_last_id = None
+    first_minute = None
     for hour in range(24):
         path = STAGED / day / 'hours' / f'{hour:02d}' / f'{symbol}.csv'
-        with path.open('rb') as stream:
-            sources[f'{hour:02d}'] = hashlib.file_digest(stream, 'sha256').hexdigest()
-        frames.append(read_hour(path))
-    raw = pd.concat(frames, ignore_index=True)
-    unique = raw.drop_duplicates('id')
-    economic = unique.loc[~(unique.price.eq(0) & unique.qty.eq(0))]
-    if len(economic) != trade_rows:
+        events, count, first_id, last_id, sha = replay_hour(path, start+pd.Timedelta(hours=hour))
+        if previous_last_id is not None and first_id <= previous_last_id:
+            raise ValueError('overlapping UTC hour IDs: '+symbol)
+        if events.empty:
+            raise ValueError(f'no economic trades in replay UTC hour {hour:02d}')
+        previous_last_id = last_id
+        economic_count += count
+        sources[f'{hour:02d}'] = sha
+        if first_minute is None:
+            first_minute = events.time.min().floor('min')
+        add_components(parts, minute_components(events, current, first_minute=first_minute))
+        current = quantiles(events)
+        del events
+    if economic_count != trade_rows:
         raise ValueError(f'replay trade count differs from baseline: {symbol} '
-                         f'{len(economic)}/{trade_rows}')
-    factors = daily_from_events(events_from_trades(raw), day, seed)
+                         f'{economic_count}/{trade_rows}')
+    factors = daily_factors(minute_frame(parts, day), day)
+    factors.update(formula_version=FORMULA_VERSION, prior_day_23h_quantiles=list(seed),
+                   next_day_00h_quantiles=list(current))
     evidence = {'kind': 'replayed_complete_hourly_stage',
+                'processing': 'one_utc_hour_at_a_time',
+                'maximum_hour_bytes': MAX_REPLAY_HOUR_BYTES,
                 'formula_code_sha256': FORMULA_CODE_SHA256,
                 'previous_hour_seed': list(seed),
+                'previous_hour_source_sha256': seed_sha,
                 'hourly_source_sha256': sources,
-                'trade_rows': len(economic)}
+                'trade_rows': economic_count}
     return factors, evidence
 
 
@@ -134,12 +183,12 @@ def emit(day: str, prepared_metadata: dict | None = None) -> dict:
             if cached['source_sha256'] != source_sha:
                 raise ValueError('threshold changed inside its active UTC hour: '+key)
             if cached['source_size'] != info.st_size or cached['source_mtime_ns'] != info.st_mtime_ns:
-                raw = read_hour(source)
-                if quantiles(events_from_trades(raw)) != tuple(cached['quantiles']):
+                revised = quantiles(events_from_trades(read_hour(source)))
+                if revised != tuple(cached['quantiles']):
                     replay_symbols.setdefault(symbol, []).append('revised_quantile:'+key)
                 else:
                     unchanged_quantile_revisions.append(key)
-        except (OSError, ValueError, KeyError, TypeError) as exc:
+        except (OSError, ValueError, KeyError, TypeError, MemoryError) as exc:
             excluded_symbols[symbol]=[type(exc).__name__ + ': ' + str(exc)]
     phase('threshold_revision_checks_seconds')
     manifest = digest(minute_hashes)
@@ -192,7 +241,7 @@ def emit(day: str, prepared_metadata: dict | None = None) -> dict:
                         'baseline_evidence_kind': baseline_kind,
                         'available_at': datetime.now(timezone.utc).isoformat()})
             rows[symbol] = old
-        except (OSError, ValueError, KeyError, TypeError) as exc:
+        except (OSError, ValueError, KeyError, TypeError, MemoryError) as exc:
             excluded_symbols[symbol]=[type(exc).__name__ + ': ' + str(exc)]
     symbols=sorted(rows)
     if not symbols:raise ValueError('no valid v3 daily symbols after exclusions')

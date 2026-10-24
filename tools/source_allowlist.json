@@ -28,6 +28,7 @@
     "deploy/seoul_lagged_minute_shadow.py",
     "deploy/seoul_v3_source_producer.py",
     "deploy/top50_boundary_publish.py",
+    "tests/test_hourly_replay_memory.py",
     "tests/test_optimizer_overlay.py",
     "tests/test_qualified_pool.py",
     "tests/test_quality_tolerance.py",

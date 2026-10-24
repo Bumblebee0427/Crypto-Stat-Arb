@@ -139,8 +139,8 @@
   },
   {
     "path": "live/deploy/seoul_lagged_daily_shadow.py",
-    "source_sha256": "40caab2b1c1d65c5f3e62b3bf7edb6f4a8fe2f828c044ddfd7709039d0eb7937",
-    "export_sha256": "7a52da28cf8455704e1a15e9686befac48d7574ea7d9b8059e6312decb6eb3e6",
+    "source_sha256": "2b6679d2898aa7431bdfc5870487699aa687ba0751630d2470fc54af4b22fedf",
+    "export_sha256": "29e7881477f89f3d89dff67490a44b1577a03eef31efc224e1845d86555b0c2c",
     "portable_adapter": true
   },
   {
@@ -166,6 +166,12 @@
     "source_sha256": "c7860748ca88d738819d0217c8b0c4b070177d7a3ace7b0638bb90a1649e7d89",
     "export_sha256": "28e42dce8f324223436a26343f2aa7b5e48161f0803da1cc930a0e0361572a56",
     "portable_adapter": true
+  },
+  {
+    "path": "live/tests/test_hourly_replay_memory.py",
+    "source_sha256": "a05627ec1e9c1d36f3ac87dc79526054b7dc72b86e716b6864f663e6e2236ee3",
+    "export_sha256": "a05627ec1e9c1d36f3ac87dc79526054b7dc72b86e716b6864f663e6e2236ee3",
+    "portable_adapter": false
   },
   {
     "path": "live/tests/test_optimizer_overlay.py",
