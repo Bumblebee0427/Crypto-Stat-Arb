@@ -59,6 +59,18 @@ def fill(day: str, through_hour: int, max_hours: int = 24, through_minute: int =
                                       'recovery_error_scope_normalized':True})
                     normalized+=1
                     continue
+                # Named per-coin errors are already actionable exclusions in
+                # read_minute(). Re-reading them on every bounded scan starves
+                # later genuinely missing hours when one coin stays blocked.
+                if (old.get('status')=='waiting' and errors
+                        and isinstance(old.get('components'),dict) and old['components']
+                        and old.get('threshold_source_sha256')
+                        and old.get('minute')==instant.isoformat()
+                        and old.get('formula_version')==FORMULA_VERSION
+                        and old.get('minute_code_sha256')==CODE_SHA256
+                        and old.get('invalid_records_in_lookback')==0
+                        and all(isinstance(e.get('symbol'),str) and e['symbol'] for e in errors)):
+                    continue
             except (OSError, ValueError):pass
         markers[instant] = {'components': {}, 'trade_counts': {}, 'threshold_source_sha256': {}}
     hours = sorted({t.hour for t in markers})[:max_hours]

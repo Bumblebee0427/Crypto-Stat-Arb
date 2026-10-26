@@ -97,10 +97,11 @@ class GapRepairTest(unittest.TestCase):
         self.assertEqual(after['status'],'provisional')
         self.assertEqual(after['components'],before['components'])
 
-    def test_next_hour_error_still_blocks_its_minute59_boundary(self):
+    def test_valid_partial_minute_keeps_its_symbol_exclusion(self):
         self.warm({59});self.waiting(59,'2026-10-01T01:00:00+00:00')
-        with self.assertRaisesRegex(ValueError,'not ready'):repair.fill(self.day,0)
-        self.assertEqual(json.loads((self.minutes/'0059.json').read_text())['status'],'waiting')
+        before=(self.minutes/'0059.json').read_bytes()
+        self.assertEqual(repair.fill(self.day,0)['minutes_written'],0)
+        self.assertEqual((self.minutes/'0059.json').read_bytes(),before)
 
     def test_oversized_coin_is_isolated_without_losing_good_components(self):
         self.universe.write_text(json.dumps({'tradable_symbols':['ADAUSDT','BADUSDT']}))
@@ -115,6 +116,17 @@ class GapRepairTest(unittest.TestCase):
         self.assertEqual(row['components']['ADAUSDT']['ultra_buy'],20)
         self.assertEqual(row['missing_thresholds'][0]['symbol'],'BADUSDT')
         self.assertIn('memory_budget',row['missing_thresholds'][0]['reason'])
+
+    def test_excluded_coin_does_not_starve_later_missing_hour(self):
+        self.warm({10});self.waiting(10,'2026-10-01T00:00:00+00:00')
+        # Other 00:xx markers are already complete. Repair hour 01 despite the
+        # valid named exclusion in hour 00 and a one-hour processing budget.
+        self.hour(1,f'1,{self.stamp(1,10,30)},10,2,False\n')
+        with patch.object(repair,'threshold',return_value=((1,5,15),'source-sha')):
+            result=repair.fill(self.day,1,max_hours=1,through_minute=10)
+        self.assertEqual(result['minutes_written'],11)
+        self.assertTrue((self.minutes/'0110.json').exists())
+        self.assertEqual(json.loads((self.minutes/'0010.json').read_text())['status'],'waiting')
 
 
 if __name__=='__main__':unittest.main()
