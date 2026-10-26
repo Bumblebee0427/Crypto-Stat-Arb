@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""At UTC midnight, publish audited previous-hour TOP50 targets by +10 minutes."""
+"""At UTC midnight, publish audited previous-hour TOP50 targets within the bounded decision window."""
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -166,9 +166,10 @@ def main():
             # holds the original audit permanently unless explicitly replaced.
             metadata_future = None
         time.sleep(3)
-    print(json.dumps({'day':day,'status':'missed_ten_minute_window','reason':last,
+    print(json.dumps({'day':day,'status':'missed_publication_window','reason':last,
                       'last_exception':last_exception,'emit_attempts':emit_attempts,
                       'emit_seconds':emit_seconds,'build_seconds':build_seconds}), flush=True)
+    raise SystemExit(2)
 
 
 if __name__ == '__main__':

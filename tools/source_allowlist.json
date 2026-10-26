@@ -33,7 +33,13 @@
     "tests/test_qualified_pool.py",
     "tests/test_quality_tolerance.py",
     "tests/test_reference_formula_v2.py",
-    "tests/test_top50.py"
+    "tests/test_top50.py",
+    "deploy/seoul_lagged_bootstrap_minutes.py",
+    "deploy/seoul_lagged_gap_watch.py",
+    "tests/test_backfill_resource_policy.py",
+    "tests/test_v3_gap_repair.py",
+    "deploy/seoul_lagged_backfill_gate.py",
+    "deploy/seoul_factor_backfill_gate.py"
   ],
   "backtest": [
     "backtest.py",

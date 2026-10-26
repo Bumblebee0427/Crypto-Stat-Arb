@@ -27,6 +27,17 @@ def replace_assignment(text, name, replacement):
 
 
 def portable(kind, name, text):
+    # These recovery helpers inherit portable roots from the minute module.
+    if kind == 'live' and name in {'deploy/seoul_lagged_bootstrap_minutes.py', 'deploy/seoul_lagged_gap_watch.py', 'deploy/seoul_lagged_backfill_gate.py'}:
+        return text
+    if kind == 'live' and name == 'deploy/seoul_factor_backfill_gate.py':
+        calls = [n for n in ast.walk(ast.parse(text)) if isinstance(n, ast.Call)
+                 and ast.unparse(n.func) == 'shutil.disk_usage']
+        if len(calls) != 1:
+            raise ValueError('backfill disk gate changed; review portable adapter')
+        original = ast.get_source_segment(text, calls[0].args[0])
+        return text.replace('import shutil', 'from data_center.paths import BASE\nimport shutil').replace(
+            original, "str(BASE/'data')")
     if kind == 'live' and name.startswith('deploy/') and name.endswith('.py'):
         if name.endswith('seoul_lagged_daily_prefix.py'):
             text = replace_assignment(text, 'ROOT', "BASE / 'data/lagged_quantile_v3'")

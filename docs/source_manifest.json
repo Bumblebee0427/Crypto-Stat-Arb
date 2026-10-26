@@ -49,8 +49,8 @@
   },
   {
     "path": "live/data_center/lagged_factor_worker.py",
-    "source_sha256": "8aaed519f5be9db4ca3850c34a73d373b4abe50cd1e5da01dd0b8eca078a8538",
-    "export_sha256": "8aaed519f5be9db4ca3850c34a73d373b4abe50cd1e5da01dd0b8eca078a8538",
+    "source_sha256": "374a89a4c52a6c9862cbb6e6b1a1bb7e4a9eddf6d8f80f52f120eba7e6697ca4",
+    "export_sha256": "374a89a4c52a6c9862cbb6e6b1a1bb7e4a9eddf6d8f80f52f120eba7e6697ca4",
     "portable_adapter": false
   },
   {
@@ -163,8 +163,8 @@
   },
   {
     "path": "live/deploy/top50_boundary_publish.py",
-    "source_sha256": "c7860748ca88d738819d0217c8b0c4b070177d7a3ace7b0638bb90a1649e7d89",
-    "export_sha256": "28e42dce8f324223436a26343f2aa7b5e48161f0803da1cc930a0e0361572a56",
+    "source_sha256": "803fc7b9f65e32d8ac849dfe7eed6be03fcc4a2834bf8ab6f59b6e0058df5e5c",
+    "export_sha256": "fca4feb8ec2ba46ea99ebe623e0e9f5040782b1ca40d99fa05d5451ccb08ef8f",
     "portable_adapter": true
   },
   {
@@ -201,6 +201,42 @@
     "path": "live/tests/test_top50.py",
     "source_sha256": "b85e38f620d04347b9578dab2509838d8b02bfe4d191e7a0353df23a87d9eb02",
     "export_sha256": "aca18f7cfa20049560f6a6fc1cabc9879a960397954510e31f0daf2f0e9ae346",
+    "portable_adapter": true
+  },
+  {
+    "path": "live/deploy/seoul_lagged_bootstrap_minutes.py",
+    "source_sha256": "84a04fe967f6b82212afaba6fa5df4a3851443f4dbab9592cc32c9cdc70a3fd9",
+    "export_sha256": "84a04fe967f6b82212afaba6fa5df4a3851443f4dbab9592cc32c9cdc70a3fd9",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/deploy/seoul_lagged_gap_watch.py",
+    "source_sha256": "da21773dd4e72146917a04b3012179eb06cef15a920c9aba30d8eb0e293e809f",
+    "export_sha256": "da21773dd4e72146917a04b3012179eb06cef15a920c9aba30d8eb0e293e809f",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/tests/test_backfill_resource_policy.py",
+    "source_sha256": "cdc1d8edeaff2bda88ba3370b4201b61676d180497a0602c1d3431c0a0156b3f",
+    "export_sha256": "cdc1d8edeaff2bda88ba3370b4201b61676d180497a0602c1d3431c0a0156b3f",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/tests/test_v3_gap_repair.py",
+    "source_sha256": "f64bb91422c05d870985e0dc91bb6e77d971d704bbb92ff6b42dd2e963c0c84a",
+    "export_sha256": "f64bb91422c05d870985e0dc91bb6e77d971d704bbb92ff6b42dd2e963c0c84a",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/deploy/seoul_lagged_backfill_gate.py",
+    "source_sha256": "d2e75107c74a42af6914be97011d4634d20c86f388d0cc304959d587f1efc9ea",
+    "export_sha256": "d2e75107c74a42af6914be97011d4634d20c86f388d0cc304959d587f1efc9ea",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/deploy/seoul_factor_backfill_gate.py",
+    "source_sha256": "8b8850935f402a49b688e525c64729a592823f6e9bf5494fb6213a1d4c8b6c31",
+    "export_sha256": "b9ab17d52cd03ea8bd376c2274f65c31e7f7374e95bca37e3aa6161939c9c572",
     "portable_adapter": true
   },
   {
