@@ -46,7 +46,7 @@ python3 -m venv .venv
 python3 tools/check_export.py
 ```
 
-当前验证：30 项实盘计算/接入校验测试、64 项 Optimizer 测试通过。测试使用合成数据，不需要账户或交易权限。只运行实盘计算时可安装 `live/requirements.txt`。
+当前验证：62 项实盘导出计算测试通过；B接入另有55项选币、发布及执行回归测试通过。Optimizer历史验证与运行口径见其说明。测试使用合成数据，不需要账户或交易权限。只运行实盘计算时可安装 `live/requirements.txt`。
 
 ## 运行计算与回测
 

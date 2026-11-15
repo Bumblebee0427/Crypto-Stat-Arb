@@ -35,4 +35,4 @@ cd live
 python3 -m unittest tests.test_spot_split_strategy tests.test_qualified_pool tests.test_top50 tests.test_optimizer_overlay -q
 ```
 
-生产预演使用当日真实因子与缓存交易规则，检查发布、独立选币审计、数量步长、最小名义金额和预算；预演不创建账户客户端、不提交订单。最终部署摘要在发布记录中保存；不上传账户、持仓、密钥或订单。
+生产预演使用当日真实因子与缓存交易规则，检查发布、独立选币审计、数量步长、最小名义金额和预算；预演不创建账户客户端、不提交订单。两端已于2026-11-15 UTC20:11完成安装，UTC20:12复核发布/执行版本、源文件哈希、旧版备份和定时器。部署没有提交订单，首轮B换仓尚待11月16日08:00发生。实际执行摘要见 [部署回执](spot_split_B_deployment.json)；不上传账户、持仓、密钥或订单。

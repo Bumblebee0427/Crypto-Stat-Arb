@@ -1,0 +1,35 @@
+{
+  "strategy_version": "bigultra_v3_global_top50_spot_split_l40_s30_min10_20261115_v1",
+  "source_commit": "87adf6bd6193b4f71607e3259ae6d8a89cf9a079",
+  "previous_source_commit": "6b04abd2db77094fbace80698c4f4fe98079b6d3",
+  "previous_archive_branch": "archive/pre-spot-B-20261115",
+  "deployed_at_utc": {
+    "seoul": "2026-11-15T20:11:28.912439+00:00",
+    "trade": "2026-11-15T20:11:32.747248+00:00"
+  },
+  "effective_boundary_utc": "2026-11-16T00:00:00+00:00",
+  "effective_boundary_asia_shanghai": "2026-11-16T08:00:00+08:00",
+  "post_deploy_hashes_and_versions_verified": true,
+  "deployed_source_hashes_match_public_source_manifest": true,
+  "both_daily_timers_active": true,
+  "legacy_optimizer_enabled": false,
+  "prior_source_and_optimizer_configuration_backed_up": true,
+  "rollback_scripts_present_and_compile": true,
+  "historical_target_parity": {
+    "historical_days": 659,
+    "first": "2025-01-01",
+    "last": "2026-10-21",
+    "maximum_weight_error": 0.0,
+    "same_input_all_target_weights_match": true,
+    "live_allocation_multiplier": 2.0,
+    "summary_only_no_account_data": true
+  },
+  "tests": {
+    "local_selection_publication_execution_regression": 55,
+    "exported_live_computation_suite": 62
+  },
+  "public_only_preflight_sizing_passed": true,
+  "orders_submitted_by_deployment": false,
+  "current_positions_and_previous_attempts_unchanged_at_verification": true,
+  "first_live_rebalance_status": "scheduled_not_yet_observed"
+}
