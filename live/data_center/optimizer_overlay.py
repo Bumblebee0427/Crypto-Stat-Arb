@@ -26,6 +26,8 @@ def wait_deadline(snapshot):
 
 def should_wait(info, root, now, snapshot=None):
     """Only a missing computation gets a bounded grace period; failures fall back."""
+    if snapshot is not None and snapshot.get('allocation_method')=='spot_split_l40_s30_min10_equal_v1':
+        return False
     if info.get('status') in ('applied', 'baseline_fallback') or snapshot is None:
         return False
     try:
@@ -118,6 +120,13 @@ def apply(snapshot, artifact, positions, budget, now):
 
 
 def load_and_apply(snapshot, root, positions, budget, now):
+    # B was evaluated with group-equal weights, not the legacy25% risk blend.
+    from data_center.spot_split_strategy import ALLOCATION_METHOD
+    if snapshot.get('allocation_method')==ALLOCATION_METHOD:
+        return snapshot,{'status':'disabled_by_strategy','reason':'spot_split_equal_weights','base_snapshot_id':snapshot['snapshot_id']}
+    config_path=Path(root)/'optimizer/enabled.json'
+    if config_path.exists() and json.loads(config_path.read_text()).get('enabled') is False:
+        return snapshot,{'status':'disabled','base_snapshot_id':snapshot['snapshot_id']}
     path = Path(root)/'optimizer'/('target_'+snapshot['window_end'][:10]+'.json')
     try:
         if path.stat().st_size > 1_000_000:

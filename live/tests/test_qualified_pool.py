@@ -8,7 +8,9 @@ from unittest.mock import patch
 from data_center.base_strategy import MAIN, SMALL, SOURCE_VERSION
 from data_center.contract import validate, digest
 from data_center.publisher import build
-from data_center.top50_strategy import LAGGED_FORMULA_VERSION, LAGGED_STRATEGY_VERSION, select
+from data_center.top50_strategy import LAGGED_FORMULA_VERSION, LAGGED_STRATEGY_VERSION
+from data_center.spot_split_strategy import select
+from data_center.spot_membership import SCHEMA as SPOT_SCHEMA
 from data_center.lagged_quantile_v3 import FORMULA_CODE_SHA256
 from deploy import seoul_lagged_daily_prefix as prefix
 from deploy import seoul_lagged_daily_shadow as daily
@@ -26,6 +28,12 @@ class QualifiedPoolTest(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.symbols = [f'C{i}USDT' for i in range(100)]
+        self.spot_members={s:i%2==0 for i,s in enumerate(self.symbols)}
+        self.write(self.root/'inputs/spot_membership'/f'{DAY}.json',{
+            'schema_version':SPOT_SCHEMA,'signal_day':DAY,'asof':END.isoformat(),
+            'observed_hour':(END-timedelta(hours=1)).isoformat(),
+            'fetched_at':(NOW-timedelta(minutes=30)).isoformat(),
+            'membership':self.spot_members,'excluded_symbols':{}})
         self.universe = self.root/'universe.json'
         self.write(self.universe, {'tradable_symbols': self.symbols,
                    'symbol_onboard_dates': {s: '2020-01-01' for s in self.symbols},
@@ -76,7 +84,7 @@ class QualifiedPoolTest(unittest.TestCase):
         self.assertEqual(candidate['coverage']['requested'], 100)
         self.assertEqual(candidate['coverage']['missing'], {})
         self.assertEqual(set(candidate['factors']), set(self.symbols)-set(excluded))
-        self.assertEqual(candidate['allocations'], select(candidate['factors'], .1)['allocations'])
+        self.assertEqual(candidate['allocations'], select(candidate['factors'], .1,self.spot_members)['allocations'])
         self.assertFalse(set(excluded)&set(candidate['allocations']))
         validate(candidate, NOW, actionable=False, expected_formula=LAGGED_FORMULA_VERSION,
                  expected_strategy=LAGGED_STRATEGY_VERSION)
@@ -160,10 +168,16 @@ class SourcePoolTest(unittest.TestCase):
             candidate = {'status': 'complete', 'blockers': [], 'snapshot_id': 'a'*64,
                          'generated_at': (END+timedelta(minutes=1)).isoformat(),
                          'coverage': {'eligible': 1, 'excluded_symbols': {'BEATUSDT': ['bad_quality']}}}
+            class ImmediatePool:
+                def submit(self,fn,*args):
+                    from concurrent.futures import Future
+                    f=Future();f.set_result(fn(*args));return f
             with patch.object(boundary, 'BASE', base), patch.object(boundary, 'ROOT', root), \
                     patch.object(boundary, 'V3', v3), patch.object(boundary, 'UNIVERSE', universe), \
                     patch.object(boundary, 'datetime', Clock), patch.object(boundary.time, 'sleep'), \
                     patch.object(boundary, 'wait_metadata', return_value=({}, None)), \
+                    patch.object(boundary, 'prepare_spot', return_value={}), \
+                    patch.object(boundary, 'ThreadPoolExecutor', return_value=ImmediatePool()), \
                     patch.object(boundary, 'readiness', return_value=({'ADAUSDT', 'BEATUSDT'}, {})), \
                     patch.object(boundary, 'build', return_value=candidate), \
                     patch.object(boundary, 'publish') as publish:

@@ -27,7 +27,7 @@ def read_json(path, default=None):
 
 def build(root, universe_path, day, now=None, profile='base', preview=False,
           factor_root=None, formula_version=FORMULA_VERSION, strategy_version=None,
-          formula_code_sha256=None, btc_input=None, universe_input=None):
+          formula_code_sha256=None, btc_input=None, universe_input=None,spot_input=None):
     root = Path(root)
     factor_root = Path(factor_root) if factor_root is not None else root
     if profile not in ('base','top50'):raise ValueError('unknown strategy profile')
@@ -217,6 +217,21 @@ def build(root, universe_path, day, now=None, profile='base', preview=False,
             else:
                 factors[symbol]['quote_volume_mean']=volume['quote_volume_mean']
                 input_hashes['volume25/'+symbol]=digest(volume)
+    from data_center.spot_split_strategy import STRATEGY_VERSION as SPOT_STRATEGY
+    spot=None
+    if strategy_version==SPOT_STRATEGY:
+        from data_center.spot_membership import validate as validate_spot
+        try:
+            spot=spot_input if spot_input is not None else read_json(root/'inputs/spot_membership'/f'{day}.json',{})
+            validate_spot(spot,day,now,list(factors))
+            input_hashes['spot_membership']=digest(spot)
+            for s in list(factors):
+                if s not in spot['membership']:
+                    factors.pop(s);retired_from_expected.add(s);observed-=1
+                    excluded_symbols[s]=[spot['excluded_symbols'][s]]
+        except (ValueError,KeyError,TypeError,OSError):
+            blockers.append('spot_membership_unavailable')
+            spot=None
     symbols=[s for s in symbols if s not in retired_from_expected]
     if observed != len(symbols) or missing:
         blockers.append("factor_history_or_market_metadata_incomplete")
@@ -230,6 +245,8 @@ def build(root, universe_path, day, now=None, profile='base', preview=False,
                    for name in ("base_strategy.py", "reference_formula_v2.py", "factor_worker.py", "publisher.py")}
     if profile=='top50':
         code_hashes.update({name:digest((Path(__file__).parent/name).read_text()) for name in ('top50_strategy.py','volume_inputs.py','quality_tolerance.py')})
+    if strategy_version==SPOT_STRATEGY:
+        code_hashes.update({name:digest((Path(__file__).parent/name).read_text()) for name in ('spot_split_strategy.py','spot_membership.py')})
     receipt_valid = (receipt.get("strategy_version") == strategy_version
             and receipt.get("formula_version") == formula_version
             and receipt.get("source_version") == SOURCE_VERSION
@@ -238,7 +255,11 @@ def build(root, universe_path, day, now=None, profile='base', preview=False,
             and receipt.get("evidence"))
     if profile != 'top50' and not receipt_valid:
         blockers.append("formula_and_source_parity_not_certified")
-    selected = select(factors, trend, volume_top_pct=.5 if profile=='top50' else None)
+    if strategy_version==SPOT_STRATEGY:
+        from data_center.spot_split_strategy import select as select_spot
+        selected=select_spot(factors,trend,spot['membership']) if spot else {'allocations':{},'longs':[],'shorts':[],'extra_shorts':[]}
+    else:
+        selected = select(factors, trend, volume_top_pct=.5 if profile=='top50' else None)
     allocations = selected["allocations"]
     if not selected["longs"] or not selected["shorts"]:
         blockers.append("empty_strategy_leg")
@@ -268,6 +289,7 @@ def build(root, universe_path, day, now=None, profile='base', preview=False,
                      "deferred_new_symbols": deferred_new_symbols,
                      "required_history_days": 12, "computed_daily_inputs": computed_inputs},
         "leverage": BASE_LEVERAGE, "allocations": allocations,
+        **({'allocation_method':selected.get('allocation_method'),'spot_membership':spot} if strategy_version==SPOT_STRATEGY else {}),
         "gross_allocation": sum(abs(v) for v in allocations.values()),
         "factors": factors, "selection": selected,
         "input_manifest_hash": digest(input_hashes), "validation_hash": digest(receipt),

@@ -14,6 +14,7 @@ from data_center.top50_strategy import LAGGED_FORMULA_VERSION,LAGGED_STRATEGY_VE
 from data_center.lagged_quantile_v3 import FORMULA_CODE_SHA256
 from data_center.live_schedule import LIVE_WINDOW_MINUTES
 from data_center.lagged_universe import readiness
+from data_center.spot_membership import prepare as prepare_spot
 from deploy.seoul_lagged_daily_shadow import emit
 from deploy.seoul_lagged_fast_metadata import metadata as fast_metadata
 
@@ -74,9 +75,10 @@ def main():
                       'deferred_new_symbols':deferred_new_symbols}), flush=True)
     near = end-timedelta(hours=2)  # Backtested BTC shift1: 06:00–07:00 CST.
     far = near-timedelta(days=30)
-    pool = ThreadPoolExecutor(max_workers=2)
+    pool = ThreadPoolExecutor(max_workers=3)
     metadata_future = None
     btc_future = None
+    spot_future = None
     signal_btc = cached_btc if ready_preboundary_btc(cached_btc, end, near, far) else None
     if signal_btc is not None:
         print(json.dumps({'day': day, 'btc_input': 'preboundary_ready',
@@ -88,6 +90,8 @@ def main():
             continue
         if metadata_future is None:
             metadata_future = pool.submit(wait_metadata, day, deadline, eligible)
+        if spot_future is None:
+            spot_future=pool.submit(prepare_spot,ROOT,universe,day)
         if signal_btc is None and btc_future is None:
             btc_future = pool.submit(fetch_btc_closes, near)
         try:
@@ -136,13 +140,18 @@ def main():
                         last = 'waiting_for_boundary_btc_recovery'
                         time.sleep(2)
                         continue
+                if not spot_future.done():
+                    last='waiting_for_spot_membership'
+                    time.sleep(2)
+                    continue
+                spot_input=spot_future.result()
                 atomic_json(ROOT/'top50/inputs/btc_hourly'/f'{day}.json', signal_btc)
                 started = time.monotonic()
                 snapshot = build(ROOT, UNIVERSE, day, profile='top50', factor_root=V3,
                                  formula_version=LAGGED_FORMULA_VERSION,
                                  strategy_version=LAGGED_STRATEGY_VERSION,
                                  formula_code_sha256=FORMULA_CODE_SHA256,
-                                 btc_input=signal_btc, universe_input=universe)
+                                 btc_input=signal_btc, universe_input=universe,spot_input=spot_input)
                 build_seconds = round(time.monotonic()-started,3)
                 last = snapshot['status']+':'+','.join(snapshot['blockers'][:3])
                 if snapshot['status'] == 'complete' and datetime.now(timezone.utc) < deadline:
@@ -165,6 +174,8 @@ def main():
             # Rebuild metadata after a source revision; a completed Future
             # holds the original audit permanently unless explicitly replaced.
             metadata_future = None
+            if spot_future is not None and spot_future.done() and spot_future.exception() is not None:
+                spot_future=None
         time.sleep(3)
     print(json.dumps({'day':day,'status':'missed_publication_window','reason':last,
                       'last_exception':last_exception,'emit_attempts':emit_attempts,

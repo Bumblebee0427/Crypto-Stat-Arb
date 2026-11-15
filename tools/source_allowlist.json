@@ -39,7 +39,10 @@
     "tests/test_backfill_resource_policy.py",
     "tests/test_v3_gap_repair.py",
     "deploy/seoul_lagged_backfill_gate.py",
-    "deploy/seoul_factor_backfill_gate.py"
+    "deploy/seoul_factor_backfill_gate.py",
+    "data_center/spot_split_strategy.py",
+    "data_center/spot_membership.py",
+    "tests/test_spot_split_strategy.py"
   ],
   "backtest": [
     "backtest.py",

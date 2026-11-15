@@ -85,8 +85,8 @@
   },
   {
     "path": "live/data_center/optimizer_overlay.py",
-    "source_sha256": "38649ce4b63d2f6d3d036dbaa2a0deccc6e638fea45a97751d0e4e88b0cb388c",
-    "export_sha256": "38649ce4b63d2f6d3d036dbaa2a0deccc6e638fea45a97751d0e4e88b0cb388c",
+    "source_sha256": "91864e77b50982f9601a38aa563c3b24a927608c3f9ff53a70401be4b948a70a",
+    "export_sha256": "91864e77b50982f9601a38aa563c3b24a927608c3f9ff53a70401be4b948a70a",
     "portable_adapter": false
   },
   {
@@ -97,8 +97,8 @@
   },
   {
     "path": "live/data_center/publisher.py",
-    "source_sha256": "b8fbd1eadf93d2b85e11f65f2da3a2b7911f629e944e68040cba4492c961b3f5",
-    "export_sha256": "b8fbd1eadf93d2b85e11f65f2da3a2b7911f629e944e68040cba4492c961b3f5",
+    "source_sha256": "ada5d5f6ce181e4a21bac3afa50d32eb850c1d7dd05ecd5c7dab162f76db4365",
+    "export_sha256": "ada5d5f6ce181e4a21bac3afa50d32eb850c1d7dd05ecd5c7dab162f76db4365",
     "portable_adapter": false
   },
   {
@@ -115,14 +115,14 @@
   },
   {
     "path": "live/data_center/runtime_selection_audit.py",
-    "source_sha256": "7cd10dc6d22ab3afcf17b3f6af44e86dd60de450b36146b6c7a3f40df387fadf",
-    "export_sha256": "7cd10dc6d22ab3afcf17b3f6af44e86dd60de450b36146b6c7a3f40df387fadf",
+    "source_sha256": "1391bd48d84c7ae6b908f32d534d53b770e88caee12ec29190db4da8145e0800",
+    "export_sha256": "1391bd48d84c7ae6b908f32d534d53b770e88caee12ec29190db4da8145e0800",
     "portable_adapter": false
   },
   {
     "path": "live/data_center/top50_strategy.py",
-    "source_sha256": "2a83ec7bb245ade8aa02f75890306f6eb42c4b3190c8a67f89739b413546ed8b",
-    "export_sha256": "2a83ec7bb245ade8aa02f75890306f6eb42c4b3190c8a67f89739b413546ed8b",
+    "source_sha256": "13bed6f8d0b8f7279e7562f193de3939065a8cd63fda6eda67314382a7f13a24",
+    "export_sha256": "13bed6f8d0b8f7279e7562f193de3939065a8cd63fda6eda67314382a7f13a24",
     "portable_adapter": false
   },
   {
@@ -163,8 +163,8 @@
   },
   {
     "path": "live/deploy/top50_boundary_publish.py",
-    "source_sha256": "803fc7b9f65e32d8ac849dfe7eed6be03fcc4a2834bf8ab6f59b6e0058df5e5c",
-    "export_sha256": "fca4feb8ec2ba46ea99ebe623e0e9f5040782b1ca40d99fa05d5451ccb08ef8f",
+    "source_sha256": "b700b673a6e0bd3d91a8beb6c521abcd3eea2bc3bb56c5c86255f8f19f67eed0",
+    "export_sha256": "645b7863ac884564a2434212268977129110d8cb24eca2aeba276eaa1c0a3897",
     "portable_adapter": true
   },
   {
@@ -181,8 +181,8 @@
   },
   {
     "path": "live/tests/test_qualified_pool.py",
-    "source_sha256": "0100e2f26dde8ae6b4238a00f8e4da51f9c4454e9fa8684ea788ccfdfe2fb85e",
-    "export_sha256": "0100e2f26dde8ae6b4238a00f8e4da51f9c4454e9fa8684ea788ccfdfe2fb85e",
+    "source_sha256": "5143d7bcd59d00d30775d24fdee6274fb87753fdaeb00360e5ed09ff5673c4dd",
+    "export_sha256": "5143d7bcd59d00d30775d24fdee6274fb87753fdaeb00360e5ed09ff5673c4dd",
     "portable_adapter": false
   },
   {
@@ -238,6 +238,24 @@
     "source_sha256": "8b8850935f402a49b688e525c64729a592823f6e9bf5494fb6213a1d4c8b6c31",
     "export_sha256": "b9ab17d52cd03ea8bd376c2274f65c31e7f7374e95bca37e3aa6161939c9c572",
     "portable_adapter": true
+  },
+  {
+    "path": "live/data_center/spot_split_strategy.py",
+    "source_sha256": "a63626c3863045ee38a569ab7c44e1e3619cd3ca27970775aaf688d87fc52089",
+    "export_sha256": "a63626c3863045ee38a569ab7c44e1e3619cd3ca27970775aaf688d87fc52089",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/data_center/spot_membership.py",
+    "source_sha256": "4d37c27e46f6c266b59d7157fa7a4acc79e8484c43fbad562407119cf4902dee",
+    "export_sha256": "4d37c27e46f6c266b59d7157fa7a4acc79e8484c43fbad562407119cf4902dee",
+    "portable_adapter": false
+  },
+  {
+    "path": "live/tests/test_spot_split_strategy.py",
+    "source_sha256": "d03cd178ef0b52b83323c33dc94ed6d1c0a46cec7ec5cbd9babe6831de90dec3",
+    "export_sha256": "d03cd178ef0b52b83323c33dc94ed6d1c0a46cec7ec5cbd9babe6831de90dec3",
+    "portable_adapter": false
   },
   {
     "path": "backtest/backtest.py",
