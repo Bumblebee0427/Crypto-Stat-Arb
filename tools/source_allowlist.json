@@ -42,7 +42,8 @@
     "deploy/seoul_factor_backfill_gate.py",
     "data_center/spot_split_strategy.py",
     "data_center/spot_membership.py",
-    "tests/test_spot_split_strategy.py"
+    "tests/test_spot_split_strategy.py",
+    "deploy/systemd/select-coin-top50-boundary-publish.service"
   ],
   "backtest": [
     "backtest.py",

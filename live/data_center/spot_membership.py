@@ -83,8 +83,14 @@ def validate(value,day,now,symbols):
     return value
 
 
+def cache_path(root,day):
+    # The boundary publisher can write top50/, while the shared inputs/ parent
+    # is read-only in its systemd namespace. Keep profile inputs together.
+    return Path(root)/'top50/inputs/spot_membership'/f'{day}.json'
+
+
 def prepare(root,universe,day):
-    p=Path(root)/'inputs/spot_membership'/f'{day}.json'
+    p=cache_path(root,day)
     if p.exists():
         value=json.loads(p.read_text());return validate(value,day,datetime.now(timezone.utc),[symbol_name(s) for s in universe['tradable_symbols']])
     value=build(universe,day);atomic_json(p,value);return value

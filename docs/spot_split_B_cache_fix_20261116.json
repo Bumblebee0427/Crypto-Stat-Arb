@@ -1,0 +1,23 @@
+{
+  "strategy_version": "bigultra_v3_global_top50_spot_split_l40_s30_min10_20261115_v1",
+  "deployed_at_utc": "2026-11-16T02:03:22.105818+00:00",
+  "reason": "Spot membership cache path outside boundary publisher systemd writable paths; EROFS prevented signal publication.",
+  "cache_relative_path": "top50/inputs/spot_membership/<signal_day>.json",
+  "source_files": {
+    "data_center/spot_membership.py": "249816ab835e5f19e0767afcb2ecd102d91a291c77bf74d98a1c22ad64af78cc",
+    "data_center/publisher.py": "a0793dc3007d9c19d19b647bd5921639b9a945c252e49c807525f03fabee91eb"
+  },
+  "prior_source_backup_created": true,
+  "service_filesystem_policy_unchanged": true,
+  "verification": {
+    "original_path_EROFS_reproduced": true,
+    "actual_service_filesystem_policy_probe_passed": true,
+    "cache_write_and_disk_fallback_read_passed": true,
+    "independent_selection_parity_passed": true,
+    "diagnostic_signal_day": "2026-11-15",
+    "diagnostic_selected_count": 80,
+    "diagnostic_only": true,
+    "live_latest_unchanged": true
+  },
+  "orders_submitted": false
+}

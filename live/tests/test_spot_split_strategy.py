@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 import pandas as pd
 from data_center.spot_split_strategy import select,STRATEGY_VERSION,ALLOCATION_METHOD
-from data_center.spot_membership import build,validate,spot_symbol
+from data_center.spot_membership import build,validate,spot_symbol,prepare,cache_path
 from data_center.optimizer_overlay import load_and_apply,awaiting_artifact,MODEL
 from data_center.contract import seal
 from data_center.runtime_selection_audit import check
@@ -71,6 +71,27 @@ class SpotSplitTest(unittest.TestCase):
             out,info=load_and_apply(s,root,{},1500,now)
             self.assertEqual(out,s);self.assertEqual(info['status'],'disabled_by_strategy')
             self.assertFalse(awaiting_artifact(s,root,now))
+
+    def test_frozen_cache_inside_boundary_service_writable_tree(self):
+        day='2026-11-15';end=datetime(2026,11,16,tzinfo=timezone.utc)
+        universe={'tradable_symbols':['AUSDT']}
+        value={'schema_version':'select_coin.spot_membership.v1','signal_day':day,
+               'asof':end.isoformat(),'observed_hour':(end-timedelta(hours=1)).isoformat(),
+               'fetched_at':end.isoformat(),'membership':{'AUSDT':True},'excluded_symbols':{}}
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            with patch('data_center.spot_membership.build',return_value=value) as fetch:
+                self.assertEqual(prepare(root,universe,day),value)
+                fetch.assert_called_once()
+            self.assertTrue((root/'top50/inputs/spot_membership'/f'{day}.json').is_file())
+            with patch('data_center.spot_membership.build',side_effect=AssertionError('must reuse frozen observation')):
+                self.assertEqual(prepare(root,universe,day),value)
+        repo=Path(__file__).resolve().parents[1]
+        unit=(repo/'deploy/systemd/select-coin-top50-boundary-publish.service').read_text()
+        writable=[Path(line.split('=',1)[1]) for line in unit.splitlines() if line.startswith('ReadWritePaths=')]
+        service_base=Path(next(line.split('=',1)[1] for line in unit.splitlines() if line.startswith('WorkingDirectory=')))
+        deployed=cache_path(service_base/'data/base_signal_v1',day)
+        self.assertTrue(any(deployed.is_relative_to(path) for path in writable))
 
 
 if __name__=='__main__':unittest.main()

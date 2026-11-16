@@ -1,0 +1,25 @@
+[Unit]
+Description=Publish audited Seoul TOP50 within twenty-five minutes of UTC midnight
+After=network-online.target
+StartLimitIntervalSec=1800
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+Restart=on-failure
+RestartSec=5s
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/srv/select-coin-live
+ExecStart=/srv/select-coin-live/.venv/bin/python -u -m deploy.top50_boundary_publish
+CPUQuota=100%
+MemoryMax=3G
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/srv/select-coin-live/data/base_signal_v1/inputs/live_daily
+ReadWritePaths=/srv/select-coin-live/data/base_signal_v1/top50
+ReadWritePaths=/srv/select-coin-live/data/lagged_quantile_v3/inputs/live_daily
+UMask=0077
+TimeoutStartSec=1800s

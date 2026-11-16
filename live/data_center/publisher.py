@@ -220,9 +220,9 @@ def build(root, universe_path, day, now=None, profile='base', preview=False,
     from data_center.spot_split_strategy import STRATEGY_VERSION as SPOT_STRATEGY
     spot=None
     if strategy_version==SPOT_STRATEGY:
-        from data_center.spot_membership import validate as validate_spot
+        from data_center.spot_membership import validate as validate_spot,cache_path as spot_cache_path
         try:
-            spot=spot_input if spot_input is not None else read_json(root/'inputs/spot_membership'/f'{day}.json',{})
+            spot=spot_input if spot_input is not None else read_json(spot_cache_path(root,day),{})
             validate_spot(spot,day,now,list(factors))
             input_hashes['spot_membership']=digest(spot)
             for s in list(factors):

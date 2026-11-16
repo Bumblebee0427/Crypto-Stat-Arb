@@ -27,6 +27,10 @@ def replace_assignment(text, name, replacement):
 
 
 def portable(kind, name, text):
+    if kind == 'live' and name == 'deploy/systemd/select-coin-top50-boundary-publish.service':
+        base = next(line.split('=', 1)[1] for line in text.splitlines()
+                    if line.startswith('WorkingDirectory='))
+        return text.replace(base, '/srv/select-coin-live')
     # These recovery helpers inherit portable roots from the minute module.
     if kind == 'live' and name in {'deploy/seoul_lagged_bootstrap_minutes.py', 'deploy/seoul_lagged_gap_watch.py', 'deploy/seoul_lagged_backfill_gate.py'}:
         return text

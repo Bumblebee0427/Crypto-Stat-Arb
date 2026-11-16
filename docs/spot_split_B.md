@@ -2,7 +2,7 @@
 
 版本：`bigultra_v3_global_top50_spot_split_l40_s30_min10_20261115_v1`。
 
-按用户指令替换原实盘选币与权重，从2026-11-16 UTC00:00（北京时间08:00）正常日频换仓开始使用。部署不触发额外手工调仓。
+按用户指令替换原实盘选币与权重，原计划从2026-11-16 UTC00:00（北京时间08:00）正常日频换仓开始使用。首轮发布因新增缓存路径不在服务可写范围内而失败；11月16日已修复并完成真实数据预演。部署与预演不触发额外手工调仓，实际启用以执行回执为准。
 
 ## 计算顺序
 
@@ -22,6 +22,10 @@
 
 现货输入在每个UTC换仓边界获取并随信号保存，包含查询时间、所观察小时、映射、排除记录和来源哈希，不用当前现货名单回填过去。全市场共享输入失败沿用原发布窗口和故障处理，不新增持仓冷启动等待。
 
+缓存固定保存在信号根目录的 `top50/inputs/spot_membership/<signal_day>.json`，由读写两端共用 `cache_path`。该目录位于发布服务已有的 `top50` 可写范围内。仓库包含 [发布服务模板](../live/deploy/systemd/select-coin-top50-boundary-publish.service)；部署时调整示例根目录、用户及Python路径，保持 `ProtectSystem=strict` 和 `ProtectHome=read-only`。
+
+11月16日修复在复制实际服务文件系统权限的临时systemd单元内验证：原路径仍触发EROFS，新路径可写且可重用冻结缓存；当日真实输入生成80个诊断目标，独立选币审计通过。预演不发布可执行信号、不提交订单。新增回归测试同时检查缓存复用与服务模板的可写范围。见 [缓存路径修复回执](spot_split_B_cache_fix_20261116.json)。
+
 ## 旧版与回滚
 
 旧公开源码保存在分支 [`archive/pre-spot-B-20261115`](https://github.com/Bumblebee0427/Crypto-Stat-Arb/tree/archive/pre-spot-B-20261115)，对应提交 `6b04abd2db77094fbace80698c4f4fe98079b6d3`。旧v4选币函数和风险优化器源码继续保留。
@@ -35,4 +39,4 @@ cd live
 python3 -m unittest tests.test_spot_split_strategy tests.test_qualified_pool tests.test_top50 tests.test_optimizer_overlay -q
 ```
 
-生产预演使用当日真实因子与缓存交易规则，检查发布、独立选币审计、数量步长、最小名义金额和预算；预演不创建账户客户端、不提交订单。两端已于2026-11-15 UTC20:11完成安装，UTC20:12复核发布/执行版本、源文件哈希、旧版备份和定时器。部署没有提交订单，首轮B换仓尚待11月16日08:00发生。实际执行摘要见 [部署回执](spot_split_B_deployment.json)；不上传账户、持仓、密钥或订单。
+生产预演使用当日真实因子与缓存交易规则，检查发布、独立选币审计、数量步长、最小名义金额和预算；预演不创建账户客户端、不提交订单。两端于2026-11-15 UTC20:11完成初次安装，UTC20:12复核了版本、哈希、备份和定时器，但未覆盖systemd运行时写权限，导致首轮发布失败。初次记录保留在 [部署回执](spot_split_B_deployment.json)，修复另行记录；不上传账户、持仓、密钥或订单。

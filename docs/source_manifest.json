@@ -97,8 +97,8 @@
   },
   {
     "path": "live/data_center/publisher.py",
-    "source_sha256": "ada5d5f6ce181e4a21bac3afa50d32eb850c1d7dd05ecd5c7dab162f76db4365",
-    "export_sha256": "ada5d5f6ce181e4a21bac3afa50d32eb850c1d7dd05ecd5c7dab162f76db4365",
+    "source_sha256": "a0793dc3007d9c19d19b647bd5921639b9a945c252e49c807525f03fabee91eb",
+    "export_sha256": "a0793dc3007d9c19d19b647bd5921639b9a945c252e49c807525f03fabee91eb",
     "portable_adapter": false
   },
   {
@@ -181,8 +181,8 @@
   },
   {
     "path": "live/tests/test_qualified_pool.py",
-    "source_sha256": "5143d7bcd59d00d30775d24fdee6274fb87753fdaeb00360e5ed09ff5673c4dd",
-    "export_sha256": "5143d7bcd59d00d30775d24fdee6274fb87753fdaeb00360e5ed09ff5673c4dd",
+    "source_sha256": "14ad93ddac928975b19879206265fe96051bde7f9529aab080418be72f9c3235",
+    "export_sha256": "14ad93ddac928975b19879206265fe96051bde7f9529aab080418be72f9c3235",
     "portable_adapter": false
   },
   {
@@ -247,15 +247,21 @@
   },
   {
     "path": "live/data_center/spot_membership.py",
-    "source_sha256": "4d37c27e46f6c266b59d7157fa7a4acc79e8484c43fbad562407119cf4902dee",
-    "export_sha256": "4d37c27e46f6c266b59d7157fa7a4acc79e8484c43fbad562407119cf4902dee",
+    "source_sha256": "249816ab835e5f19e0767afcb2ecd102d91a291c77bf74d98a1c22ad64af78cc",
+    "export_sha256": "249816ab835e5f19e0767afcb2ecd102d91a291c77bf74d98a1c22ad64af78cc",
     "portable_adapter": false
   },
   {
     "path": "live/tests/test_spot_split_strategy.py",
-    "source_sha256": "d03cd178ef0b52b83323c33dc94ed6d1c0a46cec7ec5cbd9babe6831de90dec3",
-    "export_sha256": "d03cd178ef0b52b83323c33dc94ed6d1c0a46cec7ec5cbd9babe6831de90dec3",
+    "source_sha256": "d633154e9757e032f2091592b9396fee688742ebefd00a8d30e60765ce271533",
+    "export_sha256": "d633154e9757e032f2091592b9396fee688742ebefd00a8d30e60765ce271533",
     "portable_adapter": false
+  },
+  {
+    "path": "live/deploy/systemd/select-coin-top50-boundary-publish.service",
+    "source_sha256": "3b1120c6a63dc8e40de29cc8cef81ff460e0645a97d6dc6cc1d6b2cfd3a09e8e",
+    "export_sha256": "5271f46cb7a2a315f45ec2e4a160a2c16227234b840fd0d06e206006b723bdfb",
+    "portable_adapter": true
   },
   {
     "path": "backtest/backtest.py",

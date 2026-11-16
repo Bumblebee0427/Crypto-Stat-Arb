@@ -29,7 +29,7 @@ class QualifiedPoolTest(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.symbols = [f'C{i}USDT' for i in range(100)]
         self.spot_members={s:i%2==0 for i,s in enumerate(self.symbols)}
-        self.write(self.root/'inputs/spot_membership'/f'{DAY}.json',{
+        self.write(self.root/'top50/inputs/spot_membership'/f'{DAY}.json',{
             'schema_version':SPOT_SCHEMA,'signal_day':DAY,'asof':END.isoformat(),
             'observed_hour':(END-timedelta(hours=1)).isoformat(),
             'fetched_at':(NOW-timedelta(minutes=30)).isoformat(),
